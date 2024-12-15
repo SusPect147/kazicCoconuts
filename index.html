@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, width=device-width">
-    <title>Slot Machine coconuts</title>
+    <title>Slot Machine</title>
     <style>
-        body {
+                body {
             font-family: Arial, sans-serif;
             margin: 0;
             display: flex;
@@ -151,7 +151,7 @@
             width: 70px; 
             height: auto;
             opacity: 0;
-            animation: fadeIn 0.5s ease-in-out forwards;
+            animation: fadeIn 0.1s ease-in-out forwards;
         }
 
         @keyframes fadeIn {
@@ -191,6 +191,50 @@
         #spin-button:hover:not(:disabled) {
             background: #e6b800;
         }
+        .menu-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: #ffcc00;
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .menu-button:hover {
+            background-color: #e6b800;
+        }
+
+        .menu {
+            position: absolute;
+            top: 50px;
+            left: 10px;
+            background: white;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            display: none;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .menu button {
+            background-color: #59a9c2;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            font-size: 14px;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .menu button:hover {
+            background-color: #4689a3;
+        }
     </style>
 </head>
 <body>
@@ -209,6 +253,14 @@
         <div class="slot" id="slot3"></div>
     </div>
 </div>
+
+<!-- Меню покупки билетов -->
+<button class="menu-button" id="menu-button">Menu</button>
+<div class="menu" id="menu">
+    <p>Buy Tickets:</p>
+    <button onclick="buyTickets()">1 Ticket for 19 Stars</button>
+</div>
+
 <div class="container228">
     <div class="button228" onclick="toggleMiniButtons(this)">
       <img src="cocos.png" alt="Меню" draggable="false">
@@ -264,6 +316,14 @@
     ];
     const spinButton = document.getElementById('spin-button');
 
+    const menuButton = document.getElementById('menu-button');
+    const menu = document.getElementById('menu');
+
+    // Открыть/закрыть меню
+    menuButton.addEventListener('click', () => {
+        menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    });
+
     function updateTickets(amount) {
         tickets += amount;
         ticketCounter.textContent = tickets;
@@ -306,8 +366,10 @@
         const reward = calculateReward(results);
         updateTickets(reward);
 
-        spinButton.disabled = false;
-        spinButton.textContent = 'Spin';
+        setTimeout(() => {
+            spinButton.disabled = false;
+            spinButton.textContent = 'Spin';
+        }, 2000);
     }
 
     function calculateReward(results) {
@@ -316,16 +378,30 @@
             return acc;
         }, {});
 
-        const keys = Object.keys(counts);
+        if (results.every(item => item === 'skin10.png')) {
+            return 100000;
+        }
+
         const values = Object.values(counts);
 
-        // Rewards based on counts
         if (values.includes(3)) {
-            return 1000; // All 3 are the same
+            return 1000;
         } else if (values.includes(2)) {
-            return 500; // 2 are the same
+            return 500;
         }
-        return 0; // No reward
+        return 0;
+    }
+
+    async function buyTickets() {
+        try {
+            // Вызов Telegram API для покупки
+            const confirmed = await Telegram.WebApp.showConfirm("Do you want to buy 1 ticket for 19 stars?");
+            if (confirmed) {
+                updateTickets(1000000); // Добавляем билет
+            }
+        } catch (error) {
+            console.error("Error during ticket purchase: ", error);
+        }
     }
 
     spinButton.addEventListener('click', spinSlots);
