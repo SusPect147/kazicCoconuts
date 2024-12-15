@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, width=device-width">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <link rel="icon" type="ma" href="magicticket.png">
     <title>Slot Machine</title>
     <style>
                 body {
@@ -255,10 +258,10 @@
 </div>
 
 <!-- Меню покупки билетов -->
-<button class="menu-button" id="menu-button">Menu</button>
+<button class="menu-button" id="menu-button">more tickets</button>
 <div class="menu" id="menu">
     <p>Buy Tickets:</p>
-    <button onclick="buyTickets()">1 Ticket for 19 Stars</button>
+    <button onclick="buyTickets()">1m tickets for 20 stars</button>
 </div>
 
 <div class="container228">
@@ -393,16 +396,26 @@
     }
 
     async function buyTickets() {
-        try {
-            // Вызов Telegram API для покупки
-            const confirmed = await Telegram.WebApp.showConfirm("Do you want to buy 1 ticket for 19 stars?");
-            if (confirmed) {
-                updateTickets(1000000); // Добавляем билет
-            }
-        } catch (error) {
-            console.error("Error during ticket purchase: ", error);
+    try {
+        const webApp = Telegram.WebApp;
+
+        webApp.showAlert("Processing your request..."); // Показываем сообщение
+
+        // Модальное подтверждение покупки билетов
+        const confirmed = confirm("Do you want to buy 1m tickets for 20 stars?");
+        if (confirmed) {
+            // Проверяем успешное подтверждение
+            updateTickets(1000000);
+            webApp.showAlert("1M tickets purchased successfully!");
+        } else {
+            webApp.showAlert("Purchase canceled.");
         }
+    } catch (error) {
+        console.error("Error during ticket purchase: ", error);
+        Telegram.WebApp.showAlert("An error occurred. Try again later.");
     }
+}
+
 
     spinButton.addEventListener('click', spinSlots);
 </script>
