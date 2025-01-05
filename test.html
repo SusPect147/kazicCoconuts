@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stars Donation</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        .skin-item {
+            display: inline-block;
+            text-align: center;
+            margin: 10px;
+        }
+        .skin-item img {
+            width: 100px;
+            height: 100px;
+        }
+        .skin-price {
+            font-size: 14px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Покупка Stars и скинов</h1>
+    <div class="skin-item" id="skin1">
+        <img src="черная-утка-сердечки.gif" alt="Star Skin 3">
+        <div class="skin-price">20 TGstars</div>
+        <button class="buy-skin">Купить</button>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+
+        // Обработчик для покупки скина
+        const buySkinButtons = document.querySelectorAll(".buy-skin");
+
+        buySkinButtons.forEach(button => {
+            button.addEventListener("click", () => {
+                const skinId = button.closest(".skin-item").id; // Получаем ID скина
+                const price = 20; // Цена в TGstars
+
+                tg.showPopup({
+                    message: `Вы уверены, что хотите купить этот скин за ${price} TGstars?`,
+                    buttons: [
+                        { id: "confirm", type: "ok", text: "Купить" },
+                        { id: "cancel", type: "close", text: "Отмена" },
+                    ],
+                    callback: (buttonId) => {
+                        if (buttonId === "confirm") {
+                            // Отправляем данные о покупке скина боту
+                            tg.sendData(JSON.stringify({
+                                action: "buy_skin",
+                                skin_id: skinId,
+                                price: price,
+                            }));
+                        }
+                    },
+                });
+            });
+        });
+
+        // Слушатель события получения ответа от бота
+        tg.onEvent("message", (msg) => {
+            if (msg.data?.action === "purchase_result") {
+                if (msg.data.success) {
+                    alert("Скин успешно куплен!");
+                } else {
+                    alert("Недостаточно TGstars для покупки.");
+                }
+            }
+        });
+    </script>
+</body>
+</html>
